@@ -5,7 +5,7 @@ const detectDefault = () => {
   if (typeof window === "undefined") return "ms";
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved === "en" || saved === "ms") return saved;
-  return (navigator.language || "ms").toLowerCase().startsWith("en") ? "en" : "ms";
+  return "ms";
 };
 
 export const locale = ref(detectDefault());
