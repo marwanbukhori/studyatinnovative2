@@ -51,7 +51,8 @@ onMounted(() => {
   const count = TUNE.particles;
   const positions = new Float32Array(count * 3);
   const colors = new Float32Array(count * 3);
-  const pink = new THREE.Color(0xc147e9);
+  const blue = new THREE.Color(0x3b82f6);
+  const blueLight = new THREE.Color(0x60a5fa);
   const gold = new THREE.Color(0xf5c842);
   const white = new THREE.Color(0xffffff);
   for (let i = 0; i < count; i++) {
@@ -59,7 +60,7 @@ onMounted(() => {
     positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
     positions[i * 3 + 2] = (Math.random() - 0.5) * 18;
     const mix = Math.random();
-    const c = mix < 0.4 ? pink : mix < 0.75 ? gold : white;
+    const c = mix < 0.45 ? blue : mix < 0.7 ? blueLight : mix < 0.88 ? white : gold;
     colors[i * 3] = c.r; colors[i * 3 + 1] = c.g; colors[i * 3 + 2] = c.b;
   }
   const pGeo = new THREE.BufferGeometry();
@@ -77,7 +78,8 @@ onMounted(() => {
   const particles = new THREE.Points(pGeo, pMat);
   scene.add(particles);
 
-  // ---- Graduation caps ----
+  // ---- Graduation caps (mortar boards) — disabled for now ----
+  /*
   const caps = new THREE.Group();
   // Pre-build shared geometries/materials for mobile (cheaper)
   const shared = mobile
@@ -85,8 +87,8 @@ onMounted(() => {
         baseGeo: new THREE.BoxGeometry(1.2, 0.25, 1.2),
         topGeo: new THREE.BoxGeometry(1.6, 0.08, 1.6),
         tasselGeo: new THREE.SphereGeometry(0.08, 8, 8),
-        baseMat: new THREE.MeshBasicMaterial({ color: 0x6b1f9e }),
-        topMat: new THREE.MeshBasicMaterial({ color: 0x1a0533 }),
+        baseMat: new THREE.MeshBasicMaterial({ color: 0x2563eb }),
+        topMat: new THREE.MeshBasicMaterial({ color: 0x0a1e3f }),
         tasselMat: new THREE.MeshBasicMaterial({ color: 0xf5c842 }),
       }
     : null;
@@ -98,15 +100,15 @@ onMounted(() => {
       : new THREE.Mesh(
           new THREE.BoxGeometry(1.2, 0.25, 1.2),
           new THREE.MeshStandardMaterial({
-            color: 0x2d0f66, roughness: 0.4, metalness: 0.3,
-            emissive: 0x6b1f9e, emissiveIntensity: 0.3,
+            color: 0x12316c, roughness: 0.4, metalness: 0.3,
+            emissive: 0x2563eb, emissiveIntensity: 0.3,
           })
         );
     const top = mobile
       ? new THREE.Mesh(shared.topGeo, shared.topMat)
       : new THREE.Mesh(
           new THREE.BoxGeometry(1.6, 0.08, 1.6),
-          new THREE.MeshStandardMaterial({ color: 0x1a0533, roughness: 0.3, metalness: 0.5 })
+          new THREE.MeshStandardMaterial({ color: 0x0a1e3f, roughness: 0.3, metalness: 0.5 })
         );
     top.position.y = 0.2;
     const tassel = mobile
@@ -126,11 +128,12 @@ onMounted(() => {
     caps.add(g);
   }
   scene.add(caps);
+  */
 
   // ---- Lighting (skip on mobile since we used MeshBasicMaterial) ----
   if (!mobile) {
     scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-    const pl1 = new THREE.PointLight(0xc147e9, 2, 30);
+    const pl1 = new THREE.PointLight(0x3b82f6, 2, 30);
     pl1.position.set(-10, 5, 8); scene.add(pl1);
     const pl2 = new THREE.PointLight(0xf5c842, 1.4, 30);
     pl2.position.set(10, -4, 8); scene.add(pl2);
@@ -182,12 +185,12 @@ onMounted(() => {
     particles.rotation.y = t * 0.04;
     particles.rotation.x = t * 0.02;
 
-    caps.children.forEach((c) => {
-      const s = c.userData.floatSeed;
-      c.position.y += Math.sin(t * 0.6 + s) * 0.003;
-      c.rotation.y += c.userData.spinSpeed * 0.008;
-      c.rotation.x += 0.003;
-    });
+    // caps.children.forEach((c) => {
+    //   const s = c.userData.floatSeed;
+    //   c.position.y += Math.sin(t * 0.6 + s) * 0.003;
+    //   c.rotation.y += c.userData.spinSpeed * 0.008;
+    //   c.rotation.x += 0.003;
+    // });
 
     if (TUNE.mouseFollow) {
       camera.position.x += (mouseX * 1.4 - camera.position.x) * 0.04;
@@ -210,10 +213,10 @@ onMounted(() => {
     renderer.dispose();
     pGeo.dispose();
     pMat.dispose();
-    if (shared) {
-      shared.baseGeo.dispose(); shared.topGeo.dispose(); shared.tasselGeo.dispose();
-      shared.baseMat.dispose(); shared.topMat.dispose(); shared.tasselMat.dispose();
-    }
+    // if (shared) {
+    //   shared.baseGeo.dispose(); shared.topGeo.dispose(); shared.tasselGeo.dispose();
+    //   shared.baseMat.dispose(); shared.topMat.dispose(); shared.tasselMat.dispose();
+    // }
   };
 });
 
@@ -246,7 +249,7 @@ onBeforeUnmount(() => { cleanup?.(); });
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at 70% 30%, rgba(193, 71, 233, 0.4), transparent 55%),
+    radial-gradient(ellipse at 70% 30%, rgba(96, 165, 250, 0.4), transparent 55%),
     radial-gradient(ellipse at 30% 70%, rgba(245, 200, 66, 0.2), transparent 55%);
   z-index: -1;
 }

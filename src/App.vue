@@ -4,6 +4,10 @@ import HeroCanvas from "./components/HeroCanvas.vue";
 import LogoIUC from "./components/LogoIUC.vue";
 import Icon from "./components/Icons.vue";
 
+const MS_MONTHS = ["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
+const _now = new Date();
+const currentIntake = `${MS_MONTHS[_now.getMonth()].toUpperCase()} ${_now.getFullYear()}`;
+
 const WA_NUMBER = "60115981 6620".replace(/\s/g, ""); // 01159816620 → intl format
 const waLink = (msg) =>
   `https://wa.me/${WA_NUMBER.replace(/^0/, "60")}?text=${encodeURIComponent(msg)}`;
@@ -45,11 +49,11 @@ const journey = [
   { n: "3", t: "Surat Tawaran", d: "Dapat surat tawaran & surat tajaan rasmi." },
   { n: "4", t: "Pendaftaran", d: "Daftar & hantar dokumen secara online." },
   { n: "5", t: "Orientasi Pelajar", d: "Sesi orientasi online selesa di rumah." },
-  { n: "6", t: "Kelas Bermula", d: "Mula belajar — 100% online, fleksibel." },
+  { n: "6", t: "Kelas Bermula", d: "Mula belajar. 100% online, fleksibel." },
 ];
 
 const testimonials = [
-  { q: "Saya kerja 9-5, tapi masih boleh belajar malam. Yuran RM5k sahaja — tidak sangka boleh graduate.", n: "Aina Farhana", r: "Admin Exec · KL" },
+  { q: "Saya kerja 9-5, tapi masih boleh belajar malam. Yuran RM5k sahaja, tidak sangka boleh graduate.", n: "Aina Farhana", r: "Admin Exec · KL" },
   { q: "Orientasi online sangat membantu. Pensyarah rela layan soalan walaupun waktu malam.", n: "Hafiz Rahman", r: "Technician · Johor" },
   { q: "Dulu saya fikir tak mampu. DPI buat impian diploma jadi kenyataan dalam 2 minggu.", n: "Nurul Izzah", r: "Sales · Selangor" },
 ];
@@ -74,7 +78,7 @@ function toggleFaq(i) {
 
     <main>
     <!-- ========== HERO ========== -->
-    <section class="hero" aria-label="Tawaran utama — Diploma RM5,000">
+    <section class="hero" aria-label="Tawaran utama Diploma RM5,000">
       <HeroCanvas />
       <div class="hero-inner container">
         <nav class="nav">
@@ -85,7 +89,7 @@ function toggleFaq(i) {
           <div class="hero-left">
             <div class="pill">
               <Icon name="clock" :size="14" />
-              TEMPAT TERHAD · INTAKE APRIL 2026
+              TEMPAT TERHAD · INTAKE {{ currentIntake }}
             </div>
 
             <h1 class="h1 hero-title">
@@ -95,7 +99,7 @@ function toggleFaq(i) {
 
             <p class="lead hero-lead">
               Dana Pendidikan Inovatif (DPI) tanggung <strong>RM19,000</strong> daripada yuran asal RM24,000.
-              Diploma Business Administration — 100% online, fleksibel untuk golongan bekerja.
+              Diploma Business Administration. 100% online, fleksibel untuk golongan bekerja.
             </p>
 
             <div class="cta-row">
@@ -144,7 +148,7 @@ function toggleFaq(i) {
           <div class="eyebrow">SEMAKAN SEGERA</div>
           <h2 class="h2">Semak kelayakan anda<br />dalam 30 saat.</h2>
           <p class="lead">
-            3 soalan pantas. Jika anda layak, kami akan hantar butiran program terus ke WhatsApp anda — tanpa komitmen.
+            3 soalan pantas. Jika anda layak, kami akan hantar butiran program terus ke WhatsApp anda. Tanpa komitmen.
           </p>
           <ul class="quiz-benefits">
             <li><Icon name="check" :size="16" /> Tiada bayaran untuk memohon</li>
@@ -160,7 +164,7 @@ function toggleFaq(i) {
           <div v-if="step === 0">
             <div class="step-label">Mulakan semakan</div>
             <h3 class="h3">Anda layak untuk DPI?</h3>
-            <p class="lead">Kami bantu anda tahu dalam 30 saat. Tiada ruginya — semakan percuma.</p>
+            <p class="lead">Kami bantu anda tahu dalam 30 saat. Tiada ruginya, semakan percuma.</p>
             <button class="btn btn-primary w-full" @click="step = 1">Mula <Icon name="arrow" :size="18" /></button>
           </div>
 
@@ -176,7 +180,7 @@ function toggleFaq(i) {
                 <span class="radio"></span> Tidak, kurang daripada 3 kredit
               </button>
               <button class="option" :class="{ active: answers.spm === 'other' }" @click="pick('spm', 'other')">
-                <span class="radio"></span> Saya ada kelayakan lain (STPM/Diploma)
+                <span class="radio"></span> Saya ada kelayakan lain (SKM/TVET/APEL)
               </button>
             </div>
           </div>
@@ -215,10 +219,10 @@ function toggleFaq(i) {
           <!-- Step 4 — Capture -->
           <div v-else-if="step === 4">
             <div class="step-label" :class="{ 'text-gold': qualified }">
-              {{ qualified ? '✓ Anda LAYAK — satu langkah lagi' : 'Mari kita bantu anda' }}
+              {{ qualified ? '✓ Anda LAYAK, satu langkah lagi' : 'Mari kita bantu anda' }}
             </div>
             <h3 class="h3">{{ qualified ? 'Dapatkan butiran terus di WhatsApp' : 'Mari kita semak bersama di WhatsApp' }}</h3>
-            <p class="lead">{{ qualified ? 'Kami akan hantar maklumat program & panduan pendaftaran.' : 'Ada banyak pilihan — kami akan bantu cari yang sesuai.' }}</p>
+            <p class="lead">{{ qualified ? 'Kami akan hantar maklumat program & panduan pendaftaran.' : 'Ada banyak pilihan. Kami akan bantu cari yang sesuai.' }}</p>
 
             <div class="field">
               <label>Nama penuh</label>
@@ -251,7 +255,7 @@ function toggleFaq(i) {
         <div class="eyebrow">BAGAIMANA DPI BEKERJA</div>
         <h2 class="h2 mt-3">Dari RM24,000 → RM5,000.</h2>
         <p class="lead mt-3 center-narrow">
-          Dana Pendidikan Inovatif (DPI) adalah bursary dari Innovative University College — bukan pinjaman, tidak perlu bayar balik.
+          Dana Pendidikan Inovatif (DPI) adalah bursary dari Innovative University College. Bukan pinjaman, tidak perlu bayar balik.
         </p>
 
         <div class="savings-grid mt-6">
@@ -346,7 +350,7 @@ function toggleFaq(i) {
     <!-- ========== FINAL CTA ========== -->
     <section class="section final-cta">
       <div class="container text-center">
-        <div class="eyebrow final-eye">INTAKE APRIL 2026 · TEMPAT TERHAD</div>
+        <div class="eyebrow final-eye">INTAKE {{ currentIntake }} · TEMPAT TERHAD</div>
         <h2 class="h2 mt-3">Mula diploma anda minggu depan.</h2>
         <p class="lead mt-3 center-narrow">Semak kelayakan percuma. 30 saat. Tanpa komitmen.</p>
         <div class="cta-row center mt-5">
@@ -366,7 +370,7 @@ function toggleFaq(i) {
         <div class="foot-top">
           <div>
             <LogoIUC :height="40" />
-            <p class="foot-desc">Kolej universiti swasta — pengajian fleksibel untuk golongan bekerja.</p>
+            <p class="foot-desc">Kolej universiti swasta. Pengajian fleksibel untuk golongan bekerja.</p>
           </div>
           <div class="foot-right">
             <a href="https://www.innovative.edu.my" target="_blank" rel="noopener">www.innovative.edu.my</a>
@@ -397,14 +401,14 @@ function toggleFaq(i) {
 <style scoped>
 .app {
   position: relative;
-  background: #0a0118;
+  background: #020617;
 }
 .skip-link {
   position: absolute;
   left: -9999px;
   top: 8px;
   background: var(--gold);
-  color: #140533;
+  color: #060f24;
   padding: 10px 18px;
   border-radius: 8px;
   font-weight: 700;
@@ -419,16 +423,16 @@ function toggleFaq(i) {
   padding: 32px 0 80px;
   overflow: hidden;
   background:
-    radial-gradient(ellipse 80% 60% at 80% 20%, rgba(193, 71, 233, 0.35), transparent 60%),
+    radial-gradient(ellipse 80% 60% at 80% 20%, rgba(96, 165, 250, 0.35), transparent 60%),
     radial-gradient(ellipse 60% 50% at 10% 80%, rgba(245, 200, 66, 0.12), transparent 60%),
-    linear-gradient(180deg, #1a0533 0%, #2d0f66 100%);
+    linear-gradient(180deg, #0a1e3f 0%, #12316c 100%);
 }
 .hero::after {
   content: "";
   position: absolute;
   left: 0; right: 0; bottom: -1px;
   height: 120px;
-  background: linear-gradient(180deg, transparent, #0a0118);
+  background: linear-gradient(180deg, transparent, #020617);
   z-index: 1;
   pointer-events: none;
 }
@@ -442,10 +446,10 @@ function toggleFaq(i) {
 .brand { display: inline-flex; gap: 12px; align-items: center; }
 .brand-badge {
   width: 44px; height: 44px; border-radius: 10px;
-  background: linear-gradient(135deg, #c147e9, #6b1f9e);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   display: grid; place-items: center;
   font-weight: 800; font-size: 14px; color: white;
-  box-shadow: 0 4px 16px rgba(193, 71, 233, 0.4);
+  box-shadow: 0 4px 16px rgba(96, 165, 250, 0.4);
 }
 .nav-wa {
   display: inline-flex; align-items: center; gap: 8px;
@@ -487,7 +491,7 @@ function toggleFaq(i) {
 
 .trust {
   display: flex; gap: 20px; flex-wrap: wrap;
-  font-size: 13px; color: rgba(232, 213, 255, 0.75);
+  font-size: 13px; color: rgba(207, 224, 255, 0.75);
 }
 .trust span { display: inline-flex; align-items: center; gap: 6px; }
 .trust svg { color: var(--gold); }
@@ -505,7 +509,7 @@ function toggleFaq(i) {
 .savings-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .savings-orig {
   font-size: 28px; font-weight: 600;
-  color: rgba(232, 213, 255, 0.55);
+  color: rgba(207, 224, 255, 0.55);
   text-decoration: line-through;
 }
 .savings-arrow { color: var(--gold); font-size: 24px; font-weight: 800; }
@@ -524,7 +528,7 @@ function toggleFaq(i) {
 }
 .savings-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--pink), var(--gold));
+  background: linear-gradient(90deg, var(--blue-bright), var(--gold));
   border-radius: 4px;
 }
 .savings-bar-labels {
@@ -536,8 +540,8 @@ function toggleFaq(i) {
 .quiz-section {
   position: relative;
   background:
-    radial-gradient(ellipse 50% 60% at 80% 50%, rgba(107, 31, 158, 0.35), transparent 70%),
-    #0a0118;
+    radial-gradient(ellipse 50% 60% at 80% 50%, rgba(37, 99, 235, 0.35), transparent 70%),
+    #020617;
 }
 .quiz-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
 .quiz-left { display: flex; flex-direction: column; gap: 20px; }
@@ -616,7 +620,7 @@ function toggleFaq(i) {
 .savings-section {
   background:
     radial-gradient(ellipse 70% 50% at 50% 50%, rgba(245, 200, 66, 0.08), transparent 60%),
-    linear-gradient(180deg, #0a0118 0%, #140533 100%);
+    linear-gradient(180deg, #020617 0%, #060f24 100%);
   border-top: 1px solid rgba(255, 255, 255, 0.04);
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
@@ -633,12 +637,12 @@ function toggleFaq(i) {
 }
 .breakdown-card.gold { border-color: var(--gold); background: rgba(245, 200, 66, 0.08); box-shadow: 0 20px 50px rgba(245, 200, 66, 0.15); }
 .bd-label { font-size: 12px; letter-spacing: 0.1em; font-weight: 600; color: var(--muted); }
-.accent-label { color: var(--pink); }
+.accent-label { color: var(--blue-light); }
 .gold-label { color: var(--gold); }
 .bd-value { font-size: 48px; font-weight: 800; line-height: 1; }
 .bd-value.strike { text-decoration: line-through; }
-.bd-value.dim { color: rgba(232, 213, 255, 0.45); }
-.accent-value { color: var(--pink); }
+.bd-value.dim { color: rgba(207, 224, 255, 0.45); }
+.accent-value { color: var(--blue-light); }
 .gold-value {
   font-size: 56px;
   background: linear-gradient(135deg, var(--gold), var(--gold-hot));
@@ -650,7 +654,7 @@ function toggleFaq(i) {
 
 /* ========== JOURNEY ========== */
 .journey-section {
-  background: #0a0118;
+  background: #020617;
 }
 .journey-grid {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
@@ -667,10 +671,10 @@ function toggleFaq(i) {
 .journey-card:hover { transform: translateY(-4px); border-color: rgba(245, 200, 66, 0.3); }
 .journey-num {
   width: 48px; height: 48px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--pink), var(--purple));
+  background: linear-gradient(135deg, var(--blue-bright), var(--blue));
   display: grid; place-items: center;
   font-weight: 800; font-size: 20px;
-  box-shadow: 0 8px 24px rgba(193, 71, 233, 0.35);
+  box-shadow: 0 8px 24px rgba(96, 165, 250, 0.35);
 }
 .journey-title { font-size: 20px; font-weight: 700; }
 .journey-desc { font-size: 14px; color: var(--muted); line-height: 1.5; }
@@ -678,8 +682,8 @@ function toggleFaq(i) {
 /* ========== TESTIMONIALS ========== */
 .testi-section {
   background:
-    radial-gradient(ellipse 60% 50% at 20% 50%, rgba(193, 71, 233, 0.12), transparent 60%),
-    linear-gradient(180deg, #0a0118 0%, #140533 100%);
+    radial-gradient(ellipse 60% 50% at 20% 50%, rgba(96, 165, 250, 0.12), transparent 60%),
+    linear-gradient(180deg, #020617 0%, #060f24 100%);
   border-top: 1px solid rgba(255, 255, 255, 0.04);
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
@@ -699,7 +703,7 @@ function toggleFaq(i) {
 .testi-author { display: flex; align-items: center; gap: 12px; }
 .avatar {
   width: 48px; height: 48px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--pink), var(--gold));
+  background: linear-gradient(135deg, var(--blue-light), var(--gold));
   flex-shrink: 0;
   display: grid;
   place-items: center;
@@ -712,7 +716,7 @@ function toggleFaq(i) {
 
 /* ========== FAQ ========== */
 .faq-section {
-  background: #0a0118;
+  background: #020617;
 }
 .faq-list { max-width: 880px; margin-left: auto; margin-right: auto; display: flex; flex-direction: column; gap: 12px; text-align: left; }
 .faq-item {
@@ -732,8 +736,8 @@ function toggleFaq(i) {
 /* ========== FINAL CTA ========== */
 .final-cta {
   background:
-    radial-gradient(ellipse at 30% 50%, rgba(193, 71, 233, 0.3), transparent 60%),
-    linear-gradient(135deg, #2d0f66 0%, #4a1a7a 100%);
+    radial-gradient(ellipse at 30% 50%, rgba(96, 165, 250, 0.3), transparent 60%),
+    linear-gradient(135deg, #12316c 0%, #1e3a8a 100%);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
