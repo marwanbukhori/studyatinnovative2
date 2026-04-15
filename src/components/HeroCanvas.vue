@@ -47,6 +47,29 @@ onMounted(() => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, TUNE.dpr));
   renderer.setSize(w, h, false);
 
+  // ---- Backdrop: convocation photo plane ----
+  const loader = new THREE.TextureLoader();
+  const convoTex = loader.load("/assets/convocation.jpg", (tex) => {
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.anisotropy = renderer.capabilities.getMaxAnisotropy?.() || 1;
+    tex.minFilter = THREE.LinearFilter;
+    tex.magFilter = THREE.LinearFilter;
+    tex.needsUpdate = true;
+  });
+
+  // Plane sized to generously cover camera frustum at z = -4
+  const planeGeo = new THREE.PlaneGeometry(36, 22);
+  const planeMat = new THREE.MeshBasicMaterial({
+    map: convoTex,
+    color: 0x7a93c8, // slight blue-cool tint multiplied onto the photo
+    transparent: true,
+    opacity: 0.85,
+    depthWrite: false,
+  });
+  const backdrop = new THREE.Mesh(planeGeo, planeMat);
+  backdrop.position.set(0, 0, -4);
+  scene.add(backdrop);
+
   // ---- Particles ----
   const count = TUNE.particles;
   const positions = new Float32Array(count * 3);
@@ -185,6 +208,12 @@ onMounted(() => {
     particles.rotation.y = t * 0.04;
     particles.rotation.x = t * 0.02;
 
+    // Backdrop breathes + subtle parallax counter to camera
+    const breathe = 1 + Math.sin(t * 0.25) * 0.01;
+    backdrop.scale.set(breathe, breathe, 1);
+    backdrop.position.x = -camera.position.x * 0.25;
+    backdrop.position.y = -camera.position.y * 0.2;
+
     // caps.children.forEach((c) => {
     //   const s = c.userData.floatSeed;
     //   c.position.y += Math.sin(t * 0.6 + s) * 0.003;
@@ -213,6 +242,9 @@ onMounted(() => {
     renderer.dispose();
     pGeo.dispose();
     pMat.dispose();
+    planeGeo.dispose();
+    planeMat.dispose();
+    convoTex.dispose();
     // if (shared) {
     //   shared.baseGeo.dispose(); shared.topGeo.dispose(); shared.tasselGeo.dispose();
     //   shared.baseMat.dispose(); shared.topMat.dispose(); shared.tasselMat.dispose();

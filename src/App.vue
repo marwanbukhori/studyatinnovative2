@@ -3,12 +3,12 @@ import { ref, computed } from "vue";
 import HeroCanvas from "./components/HeroCanvas.vue";
 import LogoIUC from "./components/LogoIUC.vue";
 import Icon from "./components/Icons.vue";
+import LangSwitch from "./components/LangSwitch.vue";
+import { locale, t, currentIntakeLabel } from "./i18n";
 
-const MS_MONTHS = ["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
-const _now = new Date();
-const currentIntake = `${MS_MONTHS[_now.getMonth()].toUpperCase()} ${_now.getFullYear()}`;
+const currentIntake = computed(() => { void locale.value; return currentIntakeLabel(); });
 
-const WA_NUMBER = "60115981 6620".replace(/\s/g, ""); // 01159816620 → intl format
+const WA_NUMBER = "60115981 6620".replace(/\s/g, "");
 const waLink = (msg) =>
   `https://wa.me/${WA_NUMBER.replace(/^0/, "60")}?text=${encodeURIComponent(msg)}`;
 
@@ -36,104 +36,106 @@ function startQuiz() {
 
 function submitLead() {
   if (!lead.value.name.trim() || !lead.value.phone.trim()) return;
-  const msg = qualified.value
-    ? `Salam, saya ${lead.value.name}. Saya berminat dengan Diploma Business Administration & bursary DPI.\n\nKelayakan saya:\n• SPM: ${answers.value.spm === "yes" ? "3 kredit+" : "Lain-lain"}\n• Umur: ${answers.value.age === "yes" ? "18+" : "<18"}\n• Status: ${answers.value.status || "-"}\n\nTolong hubungi saya di ${lead.value.phone}. Terima kasih!`
-    : `Salam, saya ${lead.value.name}. Saya ingin tahu lebih lanjut tentang kelayakan & pilihan yang ada. No. saya: ${lead.value.phone}`;
+  const spmLabel = locale.value === "en"
+    ? (answers.value.spm === "yes" ? "3 credits+" : "Other")
+    : (answers.value.spm === "yes" ? "3 kredit+" : "Lain-lain");
+  const ageLabel = answers.value.age === "yes" ? "18+" : "<18";
+  const vars = {
+    name: lead.value.name,
+    phone: lead.value.phone,
+    spm: spmLabel,
+    age: ageLabel,
+    status: answers.value.status || "-",
+  };
+  const msg = qualified.value ? t("wa.msg.qualified", vars) : t("wa.msg.unqualified", vars);
   window.open(waLink(msg), "_blank");
   step.value = 5;
 }
 
-const journey = [
-  { n: "1", t: "Mohon DPI", d: "Isi borang permohonan dana dalam 2 minit." },
-  { n: "2", t: "Semakan Kelayakan", d: "Kami nilai dan sahkan kelayakan anda." },
-  { n: "3", t: "Surat Tawaran", d: "Dapat surat tawaran & surat tajaan rasmi." },
-  { n: "4", t: "Pendaftaran", d: "Daftar & hantar dokumen secara online." },
-  { n: "5", t: "Orientasi Pelajar", d: "Sesi orientasi online selesa di rumah." },
-  { n: "6", t: "Kelas Bermula", d: "Mula belajar. 100% online, fleksibel." },
-];
+const journey = computed(() => {
+  void locale.value;
+  return [1,2,3,4,5,6].map((n) => ({ n: String(n), title: t(`jr.${n}.t`), desc: t(`jr.${n}.d`) }));
+});
 
-const testimonials = [
-  { q: "Saya kerja 9-5, tapi masih boleh belajar malam. Yuran RM5k sahaja, tidak sangka boleh graduate.", n: "Aina Farhana", r: "Admin Exec · KL" },
-  { q: "Orientasi online sangat membantu. Pensyarah rela layan soalan walaupun waktu malam.", n: "Hafiz Rahman", r: "Technician · Johor" },
-  { q: "Dulu saya fikir tak mampu. DPI buat impian diploma jadi kenyataan dalam 2 minggu.", n: "Nurul Izzah", r: "Sales · Selangor" },
-];
+const testimonials = computed(() => {
+  void locale.value;
+  return [
+    { q: t("ts.1.q"), n: "Aina Farhana", r: t("ts.1.r") },
+    { q: t("ts.2.q"), n: "Hafiz Rahman", r: t("ts.2.r") },
+    { q: t("ts.3.q"), n: "Nurul Izzah", r: t("ts.3.r") },
+  ];
+});
 
-const faqs = ref([
-  { q: "Adakah DPI perlu dibayar balik?", a: "Tidak. DPI adalah bursary (dana bantuan) daripada kolej, bukan pinjaman. Anda hanya bayar RM5,000 sahaja.", open: true },
-  { q: "Berapa lama tempoh pengajian?", a: "Diploma Business Administration (ODL) mengambil masa 2.5–3 tahun secara 100% online dan fleksibel.", open: false },
-  { q: "Adakah saya layak jika hanya ada SPM?", a: "Ya. Syarat minimum adalah SPM dengan 3 kredit termasuk Bahasa Melayu & Matematik.", open: false },
-  { q: "Saya dah bekerja, boleh ke sambung belajar?", a: "Program ini direka khas untuk golongan bekerja. Kuliah direkod, tutorial malam & hujung minggu.", open: false },
-  { q: "Bolehkah bayar RM5,000 secara ansuran?", a: "Ya. Bayaran boleh dibuat secara ansuran bulanan sepanjang tempoh pengajian.", open: false },
-  { q: "Ijazah ini diiktiraf MQA?", a: "Ya, program diiktiraf penuh oleh MQA (MQA/PA 15580) dan JPT (N/0414/4/0006).", open: false },
-]);
-
-function toggleFaq(i) {
-  faqs.value[i].open = !faqs.value[i].open;
-}
+const openFaqs = ref({ 1: true, 2: false, 3: false, 4: false, 5: false, 6: false });
+const faqs = computed(() => {
+  void locale.value;
+  return [1,2,3,4,5,6].map((i) => ({ i, q: t(`faq.${i}.q`), a: t(`faq.${i}.a`), open: openFaqs.value[i] }));
+});
+function toggleFaq(i) { openFaqs.value[i] = !openFaqs.value[i]; }
 </script>
 
 <template>
   <div class="app">
-    <a href="#quiz" class="skip-link">Langkau ke borang semakan</a>
+    <a href="#quiz" class="skip-link">{{ t('skip') }}</a>
 
     <main>
     <!-- ========== HERO ========== -->
-    <section class="hero" aria-label="Tawaran utama Diploma RM5,000">
+    <section class="hero" :aria-label="t('nav.aria')">
       <HeroCanvas />
       <div class="hero-inner container">
         <nav class="nav">
           <LogoIUC :height="40" />
+          <LangSwitch />
         </nav>
 
         <div class="hero-grid">
           <div class="hero-left">
             <div class="pill">
               <Icon name="clock" :size="14" />
-              TEMPAT TERHAD · INTAKE {{ currentIntake }}
+              {{ t('hero.pill') }} {{ currentIntake }}
             </div>
 
             <h1 class="h1 hero-title">
-              Diploma.<br />
-              <span class="grad-text">RM5,000 sahaja.</span>
+              {{ t('hero.title.1') }}<br />
+              <span class="grad-text">{{ t('hero.title.2') }}</span>
             </h1>
 
             <p class="lead hero-lead">
-              Dana Pendidikan Inovatif (DPI) tanggung <strong>RM19,000</strong> daripada yuran asal RM24,000.
-              Diploma Business Administration. 100% online, fleksibel untuk golongan bekerja.
+              {{ t('hero.lead.pre') }} <strong>{{ t('hero.lead.amount') }}</strong> {{ t('hero.lead.post') }}
             </p>
 
             <div class="cta-row">
               <button class="btn btn-primary" @click="startQuiz">
-                Semak Kelayakan Saya · 30 saat <Icon name="arrow" :size="18" />
+                {{ t('cta.primary') }} <Icon name="arrow" :size="18" />
               </button>
-              <a :href="waLink('Salam, saya nak tahu lebih lanjut tentang Diploma RM5,000.')" target="_blank" class="btn btn-ghost">
-                <Icon name="whatsapp" :size="18" /> WhatsApp Terus
+              <a :href="waLink(t('wa.msg.hero'))" target="_blank" class="btn btn-ghost">
+                <Icon name="whatsapp" :size="18" /> {{ t('cta.wa') }}
               </a>
             </div>
 
             <div class="trust">
-              <span><Icon name="shield" :size="14" /> MQA/PA 15580</span>
-              <span><Icon name="check" :size="14" /> N/0414/4/0006</span>
-              <span><Icon name="check" :size="14" /> SPM 3 kredit</span>
-              <span><Icon name="sparkle" :size="14" /> 100% online</span>
+              <span><Icon name="shield" :size="14" /> {{ t('trust.mqa') }}</span>
+              <span><Icon name="check" :size="14" /> {{ t('trust.jpt') }}</span>
+              <span><Icon name="check" :size="14" /> {{ t('trust.spm') }}</span>
+              <span><Icon name="sparkle" :size="14" /> {{ t('trust.online') }}</span>
             </div>
           </div>
 
           <div class="hero-right">
             <div class="savings-card card">
-              <div class="savings-label">YURAN ANDA:</div>
+              <div class="savings-label">{{ t('savings.label') }}</div>
               <div class="savings-row">
                 <span class="savings-orig">RM24,000</span>
                 <span class="savings-arrow">→</span>
                 <span class="savings-now">RM5,000</span>
               </div>
-              <div class="savings-note">Anda jimat RM19,000 melalui DPI bursary</div>
+              <div class="savings-note">{{ t('savings.note') }}</div>
               <div class="savings-bar">
                 <div class="savings-bar-fill" style="width: 79%"></div>
               </div>
               <div class="savings-bar-labels">
-                <span>79% ditanggung kolej</span>
-                <span>21% bayaran anda</span>
+                <span>{{ t('savings.bar.left') }}</span>
+                <span>{{ t('savings.bar.right') }}</span>
               </div>
             </div>
           </div>
@@ -145,15 +147,13 @@ function toggleFaq(i) {
     <section id="quiz" class="section quiz-section">
       <div class="container quiz-grid">
         <div class="quiz-left">
-          <div class="eyebrow">SEMAKAN SEGERA</div>
-          <h2 class="h2">Semak kelayakan anda<br />dalam 30 saat.</h2>
-          <p class="lead">
-            3 soalan pantas. Jika anda layak, kami akan hantar butiran program terus ke WhatsApp anda. Tanpa komitmen.
-          </p>
+          <div class="eyebrow">{{ t('quiz.eyebrow') }}</div>
+          <h2 class="h2" style="white-space: pre-line">{{ t('quiz.head') }}</h2>
+          <p class="lead">{{ t('quiz.lead') }}</p>
           <ul class="quiz-benefits">
-            <li><Icon name="check" :size="16" /> Tiada bayaran untuk memohon</li>
-            <li><Icon name="check" :size="16" /> Semakan segera</li>
-            <li><Icon name="check" :size="16" /> Privasi terjamin</li>
+            <li><Icon name="check" :size="16" /> {{ t('quiz.benefit.1') }}</li>
+            <li><Icon name="check" :size="16" /> {{ t('quiz.benefit.2') }}</li>
+            <li><Icon name="check" :size="16" /> {{ t('quiz.benefit.3') }}</li>
           </ul>
         </div>
 
@@ -162,56 +162,56 @@ function toggleFaq(i) {
 
           <!-- Step 0 — intro -->
           <div v-if="step === 0">
-            <div class="step-label">Mulakan semakan</div>
-            <h3 class="h3">Anda layak untuk DPI?</h3>
-            <p class="lead">Kami bantu anda tahu dalam 30 saat. Tiada ruginya, semakan percuma.</p>
-            <button class="btn btn-primary w-full" @click="step = 1">Mula <Icon name="arrow" :size="18" /></button>
+            <div class="step-label">{{ t('quiz.intro.label') }}</div>
+            <h3 class="h3">{{ t('quiz.intro.h') }}</h3>
+            <p class="lead">{{ t('quiz.intro.p') }}</p>
+            <button class="btn btn-primary w-full" @click="step = 1">{{ t('quiz.intro.cta') }} <Icon name="arrow" :size="18" /></button>
           </div>
 
           <!-- Step 1 — SPM -->
           <div v-else-if="step === 1">
-            <div class="step-label">Soalan 1 / 3</div>
-            <h3 class="h3">Adakah anda mempunyai SPM dengan sekurang-kurangnya 3 kredit?</h3>
+            <div class="step-label">{{ t('quiz.q1.label') }}</div>
+            <h3 class="h3">{{ t('quiz.q1.h') }}</h3>
             <div class="options">
               <button class="option" :class="{ active: answers.spm === 'yes' }" @click="pick('spm', 'yes')">
-                <span class="radio"></span> Ya, saya ada 3 kredit atau lebih
+                <span class="radio"></span> {{ t('quiz.q1.o1') }}
               </button>
               <button class="option" :class="{ active: answers.spm === 'no' }" @click="pick('spm', 'no')">
-                <span class="radio"></span> Tidak, kurang daripada 3 kredit
+                <span class="radio"></span> {{ t('quiz.q1.o2') }}
               </button>
               <button class="option" :class="{ active: answers.spm === 'other' }" @click="pick('spm', 'other')">
-                <span class="radio"></span> Saya ada kelayakan lain (SKM/TVET/APEL)
+                <span class="radio"></span> {{ t('quiz.q1.o3') }}
               </button>
             </div>
           </div>
 
           <!-- Step 2 — Age -->
           <div v-else-if="step === 2">
-            <div class="step-label">Soalan 2 / 3</div>
-            <h3 class="h3">Umur anda 18 tahun ke atas?</h3>
+            <div class="step-label">{{ t('quiz.q2.label') }}</div>
+            <h3 class="h3">{{ t('quiz.q2.h') }}</h3>
             <div class="options">
               <button class="option" :class="{ active: answers.age === 'yes' }" @click="pick('age', 'yes')">
-                <span class="radio"></span> Ya, 18+
+                <span class="radio"></span> {{ t('quiz.q2.o1') }}
               </button>
               <button class="option" :class="{ active: answers.age === 'no' }" @click="pick('age', 'no')">
-                <span class="radio"></span> Tidak, bawah 18
+                <span class="radio"></span> {{ t('quiz.q2.o2') }}
               </button>
             </div>
           </div>
 
           <!-- Step 3 — Status -->
           <div v-else-if="step === 3">
-            <div class="step-label">Soalan 3 / 3</div>
-            <h3 class="h3">Status anda sekarang?</h3>
+            <div class="step-label">{{ t('quiz.q3.label') }}</div>
+            <h3 class="h3">{{ t('quiz.q3.h') }}</h3>
             <div class="options">
               <button class="option" :class="{ active: answers.status === 'working' }" @click="pick('status', 'working')">
-                <span class="radio"></span> Sedang bekerja
+                <span class="radio"></span> {{ t('quiz.q3.o1') }}
               </button>
               <button class="option" :class="{ active: answers.status === 'looking' }" @click="pick('status', 'looking')">
-                <span class="radio"></span> Menganggur / mencari kerja
+                <span class="radio"></span> {{ t('quiz.q3.o2') }}
               </button>
               <button class="option" :class="{ active: answers.status === 'student' }" @click="pick('status', 'student')">
-                <span class="radio"></span> Pelajar / baru habis SPM
+                <span class="radio"></span> {{ t('quiz.q3.o3') }}
               </button>
             </div>
           </div>
@@ -219,31 +219,31 @@ function toggleFaq(i) {
           <!-- Step 4 — Capture -->
           <div v-else-if="step === 4">
             <div class="step-label" :class="{ 'text-gold': qualified }">
-              {{ qualified ? '✓ Anda LAYAK, satu langkah lagi' : 'Mari kita bantu anda' }}
+              {{ qualified ? t('quiz.capture.label.ok') : t('quiz.capture.label.no') }}
             </div>
-            <h3 class="h3">{{ qualified ? 'Dapatkan butiran terus di WhatsApp' : 'Mari kita semak bersama di WhatsApp' }}</h3>
-            <p class="lead">{{ qualified ? 'Kami akan hantar maklumat program & panduan pendaftaran.' : 'Ada banyak pilihan. Kami akan bantu cari yang sesuai.' }}</p>
+            <h3 class="h3">{{ qualified ? t('quiz.capture.h.ok') : t('quiz.capture.h.no') }}</h3>
+            <p class="lead">{{ qualified ? t('quiz.capture.p.ok') : t('quiz.capture.p.no') }}</p>
 
             <div class="field">
-              <label>Nama penuh</label>
-              <input v-model="lead.name" type="text" placeholder="Contoh: Nurul Aina" />
+              <label>{{ t('quiz.capture.name') }}</label>
+              <input v-model="lead.name" type="text" :placeholder="t('quiz.capture.name.ph')" />
             </div>
             <div class="field">
-              <label>No. WhatsApp</label>
-              <input v-model="lead.phone" type="tel" placeholder="011-2345 6789" />
+              <label>{{ t('quiz.capture.phone') }}</label>
+              <input v-model="lead.phone" type="tel" :placeholder="t('quiz.capture.phone.ph')" />
             </div>
 
             <button class="btn btn-wa w-full" @click="submitLead" :disabled="!lead.name.trim() || !lead.phone.trim()">
-              <Icon name="whatsapp" :size="18" /> Hantar ke WhatsApp <Icon name="arrow" :size="18" />
+              <Icon name="whatsapp" :size="18" /> {{ t('quiz.capture.cta') }} <Icon name="arrow" :size="18" />
             </button>
-            <p class="fine">Dengan klik, anda bersetuju kami hubungi anda melalui WhatsApp.</p>
+            <p class="fine">{{ t('quiz.capture.fine') }}</p>
           </div>
 
           <!-- Step 5 — Done -->
           <div v-else-if="step === 5">
             <div class="check-big"><Icon name="check" :size="48" /></div>
-            <h3 class="h3">Terima kasih, {{ lead.name }}!</h3>
-            <p class="lead">Kami sudah buka WhatsApp. Jika tidak, <a :href="waLink('Salam, saya baru isi borang semakan.')" target="_blank" class="link">klik di sini</a>.</p>
+            <h3 class="h3">{{ t('quiz.done.h') }}, {{ lead.name }}!</h3>
+            <p class="lead">{{ t('quiz.done.p.pre') }} <a :href="waLink(t('wa.msg.done'))" target="_blank" class="link">{{ t('quiz.done.p.link') }}</a>.</p>
           </div>
         </div>
       </div>
@@ -252,27 +252,25 @@ function toggleFaq(i) {
     <!-- ========== SAVINGS BREAKDOWN ========== -->
     <section class="section savings-section">
       <div class="container text-center">
-        <div class="eyebrow">BAGAIMANA DPI BEKERJA</div>
-        <h2 class="h2 mt-3">Dari RM24,000 → RM5,000.</h2>
-        <p class="lead mt-3 center-narrow">
-          Dana Pendidikan Inovatif (DPI) adalah bursary dari Innovative University College. Bukan pinjaman, tidak perlu bayar balik.
-        </p>
+        <div class="eyebrow">{{ t('sav.eyebrow') }}</div>
+        <h2 class="h2 mt-3">{{ t('sav.head') }}</h2>
+        <p class="lead mt-3 center-narrow">{{ t('sav.lead') }}</p>
 
         <div class="savings-grid mt-6">
           <div class="breakdown-card">
-            <div class="bd-label">YURAN ASAL</div>
+            <div class="bd-label">{{ t('sav.orig.label') }}</div>
             <div class="bd-value strike dim">RM24,000</div>
-            <div class="bd-note">Diploma Business Administration (ODL)</div>
+            <div class="bd-note">{{ t('sav.orig.note') }}</div>
           </div>
           <div class="breakdown-card accent">
-            <div class="bd-label accent-label">BURSARY DPI</div>
+            <div class="bd-label accent-label">{{ t('sav.bursary.label') }}</div>
             <div class="bd-value accent-value">− RM19,000</div>
-            <div class="bd-note">Ditanggung sepenuhnya oleh kolej</div>
+            <div class="bd-note">{{ t('sav.bursary.note') }}</div>
           </div>
           <div class="breakdown-card gold">
-            <div class="bd-label gold-label">BAYARAN ANDA</div>
+            <div class="bd-label gold-label">{{ t('sav.you.label') }}</div>
             <div class="bd-value gold-value">RM5,000</div>
-            <div class="bd-note">Boleh dibayar secara ansuran</div>
+            <div class="bd-note">{{ t('sav.you.note') }}</div>
           </div>
         </div>
       </div>
@@ -281,15 +279,15 @@ function toggleFaq(i) {
     <!-- ========== JOURNEY ========== -->
     <section class="section journey-section">
       <div class="container text-center">
-        <div class="eyebrow">PERJALANAN ANDA</div>
-        <h2 class="h2 mt-3">Dari permohonan hingga kelas bermula.</h2>
-        <p class="lead mt-3 center-narrow">6 langkah mudah. Kami bantu anda setiap langkah.</p>
+        <div class="eyebrow">{{ t('jr.eyebrow') }}</div>
+        <h2 class="h2 mt-3">{{ t('jr.head') }}</h2>
+        <p class="lead mt-3 center-narrow">{{ t('jr.lead') }}</p>
 
         <div class="journey-grid mt-6">
           <div v-for="s in journey" :key="s.n" class="journey-card">
             <div class="journey-num">{{ s.n }}</div>
-            <div class="journey-title">{{ s.t }}</div>
-            <div class="journey-desc">{{ s.d }}</div>
+            <div class="journey-title">{{ s.title }}</div>
+            <div class="journey-desc">{{ s.desc }}</div>
           </div>
         </div>
       </div>
@@ -298,8 +296,8 @@ function toggleFaq(i) {
     <!-- ========== TESTIMONIALS ========== -->
     <section class="section testi-section">
       <div class="container text-center">
-        <div class="eyebrow">KISAH PELAJAR</div>
-        <h2 class="h2 mt-3">247+ pelajar bekerja sudah sertai DPI.</h2>
+        <div class="eyebrow">{{ t('ts.eyebrow') }}</div>
+        <h2 class="h2 mt-3">{{ t('ts.head') }}</h2>
 
         <div class="testi-grid mt-6">
           <div v-for="t in testimonials" :key="t.n" class="testi-card">
@@ -324,16 +322,16 @@ function toggleFaq(i) {
     <!-- ========== FAQ ========== -->
     <section class="section faq-section">
       <div class="container text-center">
-        <div class="eyebrow">SOALAN LAZIM</div>
-        <h2 class="h2 mt-3">Jawapan kepada soalan popular.</h2>
+        <div class="eyebrow">{{ t('faq.eyebrow') }}</div>
+        <h2 class="h2 mt-3">{{ t('faq.head') }}</h2>
 
         <div class="faq-list mt-6">
           <div
-            v-for="(f, i) in faqs"
-            :key="i"
+            v-for="f in faqs"
+            :key="f.i"
             class="faq-item"
             :class="{ open: f.open }"
-            @click="toggleFaq(i)"
+            @click="toggleFaq(f.i)"
           >
             <div class="faq-q">
               <span>{{ f.q }}</span>
@@ -350,13 +348,13 @@ function toggleFaq(i) {
     <!-- ========== FINAL CTA ========== -->
     <section class="section final-cta">
       <div class="container text-center">
-        <div class="eyebrow final-eye">INTAKE {{ currentIntake }} · TEMPAT TERHAD</div>
-        <h2 class="h2 mt-3">Mula diploma anda minggu depan.</h2>
-        <p class="lead mt-3 center-narrow">Semak kelayakan percuma. 30 saat. Tanpa komitmen.</p>
+        <div class="eyebrow final-eye">{{ t('final.eyebrow') }} {{ currentIntake }} {{ t('final.eyebrow.post') }}</div>
+        <h2 class="h2 mt-3">{{ t('final.head') }}</h2>
+        <p class="lead mt-3 center-narrow">{{ t('final.lead') }}</p>
         <div class="cta-row center mt-5">
-          <button class="btn btn-primary" @click="startQuiz">Semak Kelayakan Saya <Icon name="arrow" :size="18" /></button>
-          <a :href="waLink('Salam, saya nak tahu lebih lanjut.')" target="_blank" class="btn btn-wa">
-            <Icon name="whatsapp" :size="18" /> WhatsApp Terus
+          <button class="btn btn-primary" @click="startQuiz">{{ t('cta.primary') }} <Icon name="arrow" :size="18" /></button>
+          <a :href="waLink(t('wa.msg.generic'))" target="_blank" class="btn btn-wa">
+            <Icon name="whatsapp" :size="18" /> {{ t('cta.wa') }}
           </a>
         </div>
       </div>
@@ -370,7 +368,7 @@ function toggleFaq(i) {
         <div class="foot-top">
           <div>
             <LogoIUC :height="40" />
-            <p class="foot-desc">Kolej universiti swasta. Pengajian fleksibel untuk golongan bekerja.</p>
+            <p class="foot-desc">{{ t('footer.desc') }}</p>
           </div>
           <div class="foot-right">
             <a href="https://www.innovative.edu.my" target="_blank" rel="noopener">www.innovative.edu.my</a>
@@ -387,13 +385,13 @@ function toggleFaq(i) {
 
     <!-- Sticky WhatsApp -->
     <a
-      :href="waLink('Salam, saya nak tahu tentang Diploma RM5,000.')"
+      :href="waLink(t('wa.msg.sticky'))"
       target="_blank"
       class="sticky-wa"
       aria-label="Chat WhatsApp"
     >
       <Icon name="whatsapp" :size="22" />
-      <span class="sticky-wa-text">Chat dengan kami</span>
+      <span class="sticky-wa-text">{{ t('sticky.wa') }}</span>
     </a>
   </div>
 </template>
@@ -422,10 +420,17 @@ function toggleFaq(i) {
   min-height: 820px;
   padding: 32px 0 80px;
   overflow: hidden;
+  background: linear-gradient(180deg, #0a1e3f 0%, #12316c 100%);
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
   background:
-    radial-gradient(ellipse 80% 60% at 80% 20%, rgba(96, 165, 250, 0.35), transparent 60%),
-    radial-gradient(ellipse 60% 50% at 10% 80%, rgba(245, 200, 66, 0.12), transparent 60%),
-    linear-gradient(180deg, #0a1e3f 0%, #12316c 100%);
+    linear-gradient(90deg, rgba(10, 30, 63, 0.85) 0%, rgba(10, 30, 63, 0.55) 45%, rgba(10, 30, 63, 0.25) 70%, rgba(10, 30, 63, 0.65) 100%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.4) 0%, transparent 25%, transparent 75%, rgba(2, 6, 23, 0.85) 100%);
 }
 .hero::after {
   content: "";
@@ -442,6 +447,7 @@ function toggleFaq(i) {
   justify-content: space-between;
   align-items: center;
   padding: 0 24px 40px;
+  gap: 16px;
 }
 .brand { display: inline-flex; gap: 12px; align-items: center; }
 .brand-badge {
