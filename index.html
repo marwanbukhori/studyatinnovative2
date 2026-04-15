@@ -8,6 +8,8 @@
     <!-- Preconnect / preload for LCP -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://connect.facebook.net" crossorigin />
+    <link rel="dns-prefetch" href="https://va.vercel-scripts.com" />
     <link rel="preload" as="image" href="/assets/innovative.png" fetchpriority="high" />
 
     <!-- Favicon set -->
@@ -162,9 +164,42 @@
     </script>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <!-- Prerender / headless crawl guard — pixels skip when this is true -->
+    <script>
+      window.__IS_PRERENDER__ = /HeadlessChrome|jsdom/i.test(navigator.userAgent);
+    </script>
+
+    <!-- Meta Pixel -->
+    <script>
+      (function () {
+        if (window.__IS_PRERENDER__) return;
+        var pixelId = "%VITE_META_PIXEL_ID%";
+        if (!/^\d{10,20}$/.test(pixelId)) return;
+        !(function (f, b, e, v, n, t, s) {
+          if (f.fbq) return;
+          n = f.fbq = function () {
+            n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+          };
+          if (!f._fbq) f._fbq = n;
+          n.push = n;
+          n.loaded = !0;
+          n.version = "2.0";
+          n.queue = [];
+          t = b.createElement(e);
+          t.async = !0;
+          t.src = v;
+          s = b.getElementsByTagName(e)[0];
+          s.parentNode.insertBefore(t, s);
+        })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+        fbq("init", pixelId);
+        fbq("track", "PageView");
+      })();
+    </script>
   </head>
   <body>
     <div id="app"></div>
+    <noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=%VITE_META_PIXEL_ID%&ev=PageView&noscript=1" /></noscript>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
