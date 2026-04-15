@@ -4,6 +4,7 @@ import HeroCanvas from "./components/HeroCanvas.vue";
 import LogoIUC from "./components/LogoIUC.vue";
 import Icon from "./components/Icons.vue";
 import LangSwitch from "./components/LangSwitch.vue";
+import GraduatesMarquee from "./components/GraduatesMarquee.vue";
 import { locale, t, currentIntakeLabel } from "./i18n";
 
 const currentIntake = computed(() => { void locale.value; return currentIntakeLabel(); });
@@ -298,6 +299,15 @@ function toggleFaq(i) { openFaqs.value[i] = !openFaqs.value[i]; }
       <div class="container text-center">
         <div class="eyebrow">{{ t('ts.eyebrow') }}</div>
         <h2 class="h2 mt-3">{{ t('ts.head') }}</h2>
+      </div>
+
+      <!-- Convocation photo marquee -->
+      <div class="gallery-wrap mt-5">
+        <GraduatesMarquee />
+        <div class="gallery-caption">{{ t('ts.gallery') }}</div>
+      </div>
+
+      <div class="container text-center">
 
         <div class="testi-grid mt-6">
           <div v-for="t in testimonials" :key="t.n" class="testi-card">
@@ -692,6 +702,18 @@ function toggleFaq(i) { openFaqs.value[i] = !openFaqs.value[i]; }
     linear-gradient(180deg, #020617 0%, #060f24 100%);
   border-top: 1px solid rgba(255, 255, 255, 0.04);
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.gallery-wrap {
+  margin-top: 48px;
+  margin-bottom: 64px;
+}
+.gallery-caption {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-dim);
 }
 .testi-grid {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
