@@ -1,5 +1,6 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { inject } from "@vercel/analytics";
 import HeroCanvas from "./components/HeroCanvas.vue";
 import LogoIUC from "./components/LogoIUC.vue";
 import Icon from "./components/Icons.vue";
@@ -56,6 +57,11 @@ function submitLead() {
 const journey = computed(() => {
   void locale.value;
   return [1,2,3,4,5,6].map((n) => ({ n: String(n), title: t(`jr.${n}.t`), desc: t(`jr.${n}.d`) }));
+});
+
+// Initialize Vercel Analytics
+onMounted(() => {
+  inject();
 });
 
 const testimonials = computed(() => {
@@ -403,6 +409,8 @@ function toggleFaq(i) { openFaqs.value[i] = !openFaqs.value[i]; }
       <Icon name="whatsapp" :size="22" />
       <span class="sticky-wa-text">{{ t('sticky.wa') }}</span>
     </a>
+
+
   </div>
 </template>
 
